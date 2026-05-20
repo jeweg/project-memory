@@ -26,7 +26,7 @@ index discoverable.
   materials unless the user says otherwise.
 * Update `INDEX.md` whenever markdown working materials are created, renamed,
   moved, or substantially updated.
-* Update `OVERVIEW.md` when the shape of `materials/` changes.
+* Update `OVERVIEW.md` when the project's externally visible scope changes.
 * Do not create `IDENTITY.md` or `VISION.md` eagerly.
 * Do not move files into `_knowledge/archive/` unless the user asks; list
   archive candidates instead.
@@ -95,8 +95,8 @@ back to `STATE.md` and to each other when both exist.
   agent-created markdown naming convention. Use what you can read, summarize or
   cross-reference what is useful, and ignore what is irrelevant or unsupported.
   Edit these source artifacts only when the user asks.
-* `INDEX.md` and `OVERVIEW.md`: the two canonical files that describe the
-  namespace.
+* `INDEX.md` and `OVERVIEW.md`: the two canonical files that make the
+  namespace discoverable.
 
 `_knowledge/materials/INDEX.md` is the internal keyword index for lowercase
 markdown working files. It is how agents find relevant notes without reading
@@ -105,11 +105,19 @@ invisible. For human-added source files, including non-lowercase Markdown,
 non-Markdown, and binary files, create or update an indexed markdown note that
 points at them when they need to be discoverable.
 
-`_knowledge/materials/OVERVIEW.md` is the external-facing announcement of the
-materials namespace. It helps external agents and MCP servers decide whether to
-ask this project about specific topics. It describes `materials/` only, not
-`STATE.md`, `IDENTITY.md`, or `VISION.md`. It is an announcement, not a license
-to expose every material externally.
+`_knowledge/materials/OVERVIEW.md` is the project discovery profile for
+external readers and routing agents. It should read like a compact landing
+README for the project as represented by the materials: what the project is,
+what it is making or investigating, what it may be aiming to become, and when
+another agent should query this project as a knowledge base. It must include a
+separate one-sentence `Summary` section for dashboards and project lists, a
+longer `Description`, broad `Keywords`, and an agent-facing `Can Answer`
+section. It should not lead with "this materials namespace contains..." or
+become a file-by-file inventory. Mention specific materials only when a
+reference helps a routing agent decide whether to query this project. It
+describes externally useful project knowledge, not `STATE.md`, `IDENTITY.md`,
+`VISION.md`, or internal operational status. It is an announcement, not a
+license to expose every material externally.
 
 `_knowledge/archive/` holds materials whose insights have been fully absorbed,
 plus raw sources that back summaries in `materials/`. Agents may read archive
@@ -160,7 +168,8 @@ Maintain knowledge continuously, not as a cleanup phase:
   source-like, or useful for a future agent to rediscover.
 * Keep `INDEX.md` current whenever markdown working-material membership or
   substantive content changes.
-* Keep `OVERVIEW.md` current when the shape of the materials namespace changes.
+* Keep `OVERVIEW.md` current when the project's externally visible scope
+  changes.
 
 Knowledge coherence is part of normal edits. When you touch a curated file or a
 materials file, re-read the sections and cross-references you touched. Fix
@@ -290,27 +299,36 @@ update `INDEX.md`. The index lists markdown working files currently in
 `materials/`. If a file was moved to archive, remove its entry. If it vanished
 and you cannot tell why, ask before deleting the entry.
 
-When a materials change shifts the namespace's shape, update `OVERVIEW.md` too.
+When a materials change shifts the project's externally visible topics, update
+`OVERVIEW.md` too.
 `INDEX.md` is per-file metadata; `OVERVIEW.md` is project-level description.
 
 ### Updating OVERVIEW.md
 
-`OVERVIEW.md` announces what the materials namespace covers. It is maintained
-continuously after bootstrap.
+`OVERVIEW.md` is the project discovery profile. It is maintained continuously
+after bootstrap.
 
-Update it when materials add a new topic area, materially deepen existing
-coverage, retire an area, or change the project's externally visible scope.
+Update it when materials add a new topic area, materially deepen an externally
+useful topic, retire an area, or change the project's externally visible
+purpose.
 
 On update:
 
-* Adjust keywords if the namespace shape shifted.
-* Adjust coverage entries when topics are added, retired, or changed in depth.
-* Rewrite the one-line summary if the project scope shifted.
+* Keep `Summary` to exactly one sentence that can stand alone in project lists,
+  dashboards, and search results.
+* Rewrite `Description` when the project's purpose, output, investigation, or
+  long-term direction becomes clearer.
+* Adjust `Keywords` when the discoverable topic set shifts; keep them broad,
+  alias-rich, and search-oriented.
+* Adjust `Can Answer` when the kinds of questions this project can answer
+  change; write bullets as question families or query affordances, not file
+  names.
+* Remove file-inventory prose, especially repeated "coverage of..." bullets.
 * Bump the title freshness marker.
 
-Keep it tight: a title, one-sentence description, keywords, and a coverage
-section. Keep project-internal operational detail out. Follow the skeleton or
-banner already present in the file rather than duplicating that skeleton here.
+Keep it tight: a title, `Summary`, `Description`, `Keywords`, and `Can Answer`.
+Keep project-internal operational detail out. Follow the skeleton or banner
+already present in the file rather than duplicating that skeleton here.
 
 ### Session Wrap-Up
 
@@ -363,8 +381,9 @@ Audit the requested scope:
 * For `IDENTITY.md`, look for operational content that belongs in `STATE.md`
   and commitments violated by recent work.
 * For `VISION.md`, look for ambitions that have become active roadmap items.
-* For `OVERVIEW.md`, check that keywords and coverage match the current shape
-  of `materials/`.
+* For `OVERVIEW.md`, check that `Summary`, `Description`, `Keywords`, and
+  `Can Answer` describe the project from an external reader's or routing
+  agent's perspective rather than merely inventorying `materials/`.
 
 Name the issues, cite the conflicting passages or missing files when useful,
 and let the user decide what to update.

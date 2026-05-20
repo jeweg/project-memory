@@ -9,9 +9,9 @@ Scope is deliberately limited to the rules `AGENTS.md` calls
 "not optional" and that are deterministically checkable from file
 content alone. Things that require meaning -- whether the hot
 list reflects current priorities, whether OVERVIEW.md describes the
-namespace shape correctly, whether freshness markers are honest --
-are agent responsibilities, not script responsibilities, and stay
-out of scope.
+project discovery profile correctly, whether freshness markers
+are honest -- are agent responsibilities, not script responsibilities,
+and stay out of scope.
 
 Recovery from accidental deletion is also out of scope: the script
 reports missing files with a hint to restore them from git or from

@@ -96,10 +96,11 @@ do not scan archive proactively.
 `_knowledge/materials/INDEX.md` is the keyword index over them,
 updated by the agent as markdown working notes appear.
 
-`_knowledge/materials/OVERVIEW.md` is the external-facing
-announcement of what the project knows -- a paragraph plus keywords
-that lets another agent or MCP server figure out whether to ask
-your project about a topic.
+`_knowledge/materials/OVERVIEW.md` is the external-facing overview
+of what the project is about -- a compact landing README for the
+project's knowledge, with a one-sentence summary, a short description,
+keywords, and `Can Answer` bullets that let another agent or MCP
+server figure out whether to ask your project about a topic.
 
 Low ceremony by default. You can let the agent handle the
 bookkeeping (INDEX entries, cross-references, freshness markers)
