@@ -24,8 +24,8 @@ index discoverable.
 * Store project memory in `_knowledge/`, not in tool-private memory stores.
 * Treat `STATE.md`, `IDENTITY.md`, and `VISION.md` as authoritative over
   materials unless the user says otherwise.
-* Update `INDEX.md` whenever materials are created, renamed, moved, or
-  substantially updated.
+* Update `INDEX.md` whenever markdown working materials are created, renamed,
+  moved, or substantially updated.
 * Update `OVERVIEW.md` when the shape of `materials/` changes.
 * Do not create `IDENTITY.md` or `VISION.md` eagerly.
 * Do not move files into `_knowledge/archive/` unless the user asks; list
@@ -64,9 +64,13 @@ design point, not a structural violation.
   long-term capabilities, reframes, moon shots, and ambitions worth preserving
   without forcing them into the active roadmap.
 
-Do not create `IDENTITY.md` or `VISION.md` eagerly. Introduce them when the
-project has stable content that would otherwise keep being re-explained from
-`STATE.md` or scattered materials.
+Do not create `IDENTITY.md` or `VISION.md` eagerly, but do not defer forever.
+When stable purpose, architecture, posture, conventions, constraints, or
+non-goals have accumulated in `STATE.md` or materials, say the project has
+earned `IDENTITY.md`, name what should move, and create it once the user
+approves or asks to consolidate, promote, or factor the knowledge layer (unless
+the task is report-only). Keep `VISION.md` rarer: recommend or create it only
+for durable long-term direction, usually after `IDENTITY.md` exists.
 
 If `VISION.md` exists without `IDENTITY.md`, that is a smell. Vision without a
 grounded identity tends to drift; introduce `IDENTITY.md` first.
@@ -78,19 +82,28 @@ back to `STATE.md` and to each other when both exist.
 
 #### Materials Layer
 
-`_knowledge/materials/` contains two kinds of files:
+`_knowledge/materials/` contains three kinds of files:
 
-* Working files: lowercase-named files such as `topic-description.md`. They
-  hold exploration, session notes, partial findings, source summaries, and
-  durable knowledge artifacts. They may be messy, redundant, contradictory, or
-  stale. Err on the side of capturing; lost knowledge is more expensive than a
-  messy file.
+* Markdown working files: agent-created lowercase files such as
+  `topic-description.md`. They hold exploration, session notes, partial
+  findings, source summaries, and durable knowledge artifacts. They may be
+  messy, redundant, contradictory, or stale. Err on the side of capturing; lost
+  knowledge is more expensive than a messy file.
+* Human-added context and source files: files placed directly in `materials/`
+  by a user. They may use any useful filename or file type, including
+  non-Markdown and binary formats. Do not rename them merely to satisfy the
+  agent-created markdown naming convention. Use what you can read, summarize or
+  cross-reference what is useful, and ignore what is irrelevant or unsupported.
+  Edit these source artifacts only when the user asks.
 * `INDEX.md` and `OVERVIEW.md`: the two canonical files that describe the
   namespace.
 
-`_knowledge/materials/INDEX.md` is the internal keyword index. It is how agents
-find relevant materials without reading the whole directory. A material without
-an index entry is invisible.
+`_knowledge/materials/INDEX.md` is the internal keyword index for lowercase
+markdown working files. It is how agents find relevant notes without reading
+the whole directory. A markdown working file without an index entry is
+invisible. For human-added source files, including non-lowercase Markdown,
+non-Markdown, and binary files, create or update an indexed markdown note that
+points at them when they need to be discoverable.
 
 `_knowledge/materials/OVERVIEW.md` is the external-facing announcement of the
 materials namespace. It helps external agents and MCP servers decide whether to
@@ -145,8 +158,8 @@ Maintain knowledge continuously, not as a cleanup phase:
   project commitments, or long-term direction.
 * Capture working knowledge in `materials/` when it is preliminary, detailed,
   source-like, or useful for a future agent to rediscover.
-* Keep `INDEX.md` current whenever materials membership or substantive content
-  changes.
+* Keep `INDEX.md` current whenever markdown working-material membership or
+  substantive content changes.
 * Keep `OVERVIEW.md` current when the shape of the materials namespace changes.
 
 Knowledge coherence is part of normal edits. When you touch a curated file or a
@@ -163,11 +176,13 @@ When work produces a finding, decide where it belongs:
   `_knowledge/STATE.md`.
 * Put stable purpose, architecture, posture, or constraint knowledge in
   `_knowledge/IDENTITY.md` when it exists. If it clearly belongs there but the
-  file does not exist yet, stage it in `STATE.md` and mention that it is a
-  candidate for an eventual identity lift.
+  file does not exist yet, follow the introduction rule above: stage it in
+  `STATE.md` during ordinary work, recommend the lift once the project has
+  earned it, and create it when authorized.
 * Put long-term ambition, future direction, or moon-shot framing in
-  `_knowledge/VISION.md` when it exists. If it does not exist yet, capture the
-  material in `materials/` and mention that it may later justify `VISION.md`.
+  `_knowledge/VISION.md` when it exists. If it does not exist yet, usually
+  capture the material in `materials/`; create it only when authorized and the
+  durable long-term direction is clear.
 * Put preliminary findings, source summaries, session bridges, handoffs, email
   threads, transcripts, design notes, and detailed reference material in
   `_knowledge/materials/`.
@@ -184,10 +199,16 @@ Substantial pasted context is durable by default. When the user gives a long
 handoff, email thread, meeting transcript, design note, or similar source, write
 a materials summary unless the user explicitly asks you not to.
 
+Users do not need to pre-classify every piece of project context. If a user
+tells you something project-related, decide whether it is ephemeral chat
+context, current state, a durable material, or an index/update task, then route
+it accordingly.
+
 Inside `_knowledge/materials/`, create files freely when you have durable
 context to preserve. Outside `materials/`, update existing curated files as the
 rules require, but do not create or move files unless the user explicitly asks
-or a specific rule here names that action.
+or a specific rule here names that action. The `IDENTITY.md` and `VISION.md`
+introduction rule above is specific authorization once its conditions are met.
 
 ### Updating Curated Files
 
@@ -240,28 +261,34 @@ layer appears wrong, flag the contradiction clearly.
 
 #### Creating And Updating Materials
 
-Use descriptive lowercase filenames. The template does not impose a fixed
-pattern beyond lowercase names for working files. Pick names that are easy to
-scan in `INDEX.md`.
+When you create markdown working files, use descriptive lowercase filenames.
+The template does not impose a fixed pattern beyond lowercase names for
+agent-created working notes. Pick names that are easy to scan in `INDEX.md`.
+Human-added files do not have to follow this convention.
 
 Use a date prefix only when the date is part of what the file means, such as a
 meeting transcript, dated newsletter, or session summary. For evolving topic
 files, omit the date.
 
-Whenever you create or substantially update a working file, update
+Whenever you create or substantially update a markdown working file, update
 `_knowledge/materials/INDEX.md` in the same turn.
+
+Do not force raw human-added source files into `INDEX.md`, including Markdown
+files that do not follow the lowercase working-note convention. If such a file
+should be discoverable to future agents, create or update a markdown working
+note that summarizes or points at it, then index that note.
 
 Index entries use this shape:
 
 ```
-## <filename>
+## topic-description.md
 <10-20 comma-separated keywords covering the main topics, names, terms, and concepts>
 ```
 
-When a working file is renamed, deleted, or moved out of `materials/`, update
-`INDEX.md`. The index lists only files currently in `materials/`. If a file was
-moved to archive, remove its entry. If it vanished and you cannot tell why, ask
-before deleting the entry.
+When a markdown working file is renamed, deleted, or moved out of `materials/`,
+update `INDEX.md`. The index lists markdown working files currently in
+`materials/`. If a file was moved to archive, remove its entry. If it vanished
+and you cannot tell why, ask before deleting the entry.
 
 When a materials change shifts the namespace's shape, update `OVERVIEW.md` too.
 `INDEX.md` is per-file metadata; `OVERVIEW.md` is project-level description.
@@ -306,12 +333,14 @@ move materials into the knowledge layer, do this:
 2. Identify insights that are not yet captured in the curated layer.
 3. Route each insight to `STATE.md`, `IDENTITY.md`, `VISION.md`, or back to
    `materials/` using the routing rules above.
-4. Rewrite affected curated sections so they read as current state.
-5. Re-check the `STATE.md` hot list and update it if priorities changed.
-6. List materials that are now fully absorbed and can be moved to
+4. Apply the `IDENTITY.md` / `VISION.md` introduction rule above when the
+   consolidation reveals that either file has been earned.
+5. Rewrite affected curated sections so they read as current state.
+6. Re-check the `STATE.md` hot list and update it if priorities changed.
+7. List materials that are now fully absorbed and can be moved to
    `_knowledge/archive/`.
-7. Flag materials that are only partially absorbed; they stay in `materials/`.
-8. After files are moved, remove their entries from `INDEX.md`.
+8. Flag materials that are only partially absorbed; they stay in `materials/`.
+9. After files are moved, remove their entries from `INDEX.md`.
 
 For knowledge-heavy projects, some materials are durable reference artifacts.
 They do not consolidate upward just because they look settled; they are the
@@ -389,8 +418,9 @@ Use `python _knowledge/check.py` instead if the system aliases Python that way.
 The script checks mechanical invariants such as:
 
 * Bootstrap banners removed and placeholders filled in shipped files.
-* Every working file in `materials/` has an `INDEX.md` entry.
-* Every `INDEX.md` entry points at an existing working file.
+* Every lowercase markdown working note in `materials/` has an `INDEX.md`
+  entry.
+* Every `INDEX.md` entry points at an existing lowercase markdown working note.
 
 The script reports findings and does not modify files. If Python is not
 available, skip the script and manually inspect the same invariants.
@@ -429,8 +459,10 @@ work:
   explain the contradiction.
 * If a new material overlaps existing curated content, say what it adds beyond
   what is already captured.
-* If the `STATE.md` hot list keeps absorbing architectural content, suggest
-  introducing `IDENTITY.md`.
+* If `STATE.md` or multiple materials keep carrying stable purpose,
+  architecture, posture, conventions, constraints, compatibility targets, or
+  non-goals, say the project appears to have earned `IDENTITY.md`, name what
+  should move, and recommend creating it soon.
 * If brainstorm-shaped content keeps accumulating without a home, suggest
   introducing `VISION.md`.
 * If you notice broken `INDEX.md` membership or moved-file cross-references,

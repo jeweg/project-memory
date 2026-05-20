@@ -36,12 +36,15 @@ Checks performed:
   line numbers where they occur. Missing files are flagged with a
   recovery hint. Code blocks are excluded from the placeholder scan
   so language generics like `Map<String, Integer>` do not trip it.
-* `INDEX.md` membership: every working file in `_knowledge/materials/`
-  has a `## <filename>` entry, and every entry points at a file that
-  exists. Only `## <filename>.md` headings are treated as entries, so
-  notes and preambles in `INDEX.md` are not mistaken for stale
-  entries. Reports missing entries, stale entries, duplicate entries,
-  and any subdirectories under `materials/` (the namespace is flat).
+* `INDEX.md` membership: every lowercase markdown working note in
+  `_knowledge/materials/` has a `## filename.md` entry, and every entry points
+  at a file that exists. Human-added Markdown files with non-working-note
+  filenames (spaces, uppercase, parentheses, etc.) are allowed as source
+  artifacts and are not forced into `INDEX.md`. Only `## filename.md`
+  headings are treated as entries, so notes and preambles in `INDEX.md` are
+  not mistaken for stale entries. Reports missing entries, stale entries,
+  duplicate entries, and any subdirectories under `materials/` (the namespace
+  is flat).
 
 Run from any directory inside the project; the script walks up to
 find the `_knowledge/` directory.
@@ -76,12 +79,11 @@ CANONICAL_MATERIALS_FILES = frozenset({"INDEX.md", "OVERVIEW.md"})
 # see `_strip_code_for_placeholder_check`.
 PLACEHOLDER_RE = re.compile(r'<[^<>="]*\s[^<>="]*>')
 DATE_PLACEHOLDER_RE = re.compile(r"\bYYYY-MM-DD\b")
-# Index entries name a markdown filename: `## foo.md` or
-# `## 2026-05-14-handoff.md`. Other `##` headings (preambles, notes,
-# meta sections) are not treated as entries. The character class
-# matches the descriptive lowercase filenames the template recommends
-# plus any case the agent might use; the trailing `.md` is required.
-INDEX_HEADING_RE = re.compile(r"^##\s+([\w.\-]+\.md)\s*$")
+# Working-note filenames are the agent-created markdown convention:
+# lowercase, no spaces, no parentheses. Human-added Markdown source
+# artifacts with other names are valid but are not mechanically indexed.
+WORKING_NOTE_FILENAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*\.md$")
+INDEX_HEADING_RE = re.compile(r"^##\s+([a-z0-9][a-z0-9._-]*\.md)\s*$")
 
 def recovery_hint(rel_path: str) -> str:
     return (
@@ -182,12 +184,12 @@ def check_bootstrap(root: Path) -> list[str]:
 
 
 def parse_index_entries(text: str) -> list[str]:
-    """Return filenames named in `## <filename>.md` headings of INDEX.md.
+    """Return filenames named in `## filename.md` headings of INDEX.md.
 
-    Only headings whose text matches a markdown filename are returned.
-    Other `##` sections (preambles, meta notes, etc.) are ignored, so
-    `INDEX.md` may freely contain non-entry sections without polluting
-    the membership check.
+    Only headings whose text matches the lowercase markdown working-note
+    convention are returned. Other `##` sections (preambles, meta notes,
+    human source filenames, etc.) are ignored, so `INDEX.md` may freely
+    contain non-entry sections without polluting the membership check.
     """
     entries: list[str] = []
     for line in text.splitlines():
@@ -198,7 +200,7 @@ def parse_index_entries(text: str) -> list[str]:
 
 
 def list_working_files(materials_dir: Path) -> list[str]:
-    """List .md files in `materials/`, excluding canonical artifacts.
+    """List lowercase markdown working notes in `materials/`.
 
     Subdirectories are not returned; they are out of contract for
     `materials/` and are reported separately by `check_index_membership`.
@@ -207,8 +209,8 @@ def list_working_files(materials_dir: Path) -> list[str]:
         p.name
         for p in materials_dir.iterdir()
         if p.is_file()
-        and p.suffix == ".md"
         and p.name not in CANONICAL_MATERIALS_FILES
+        and WORKING_NOTE_FILENAME_RE.match(p.name)
     )
 
 

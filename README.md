@@ -69,8 +69,32 @@ Where the actual subject-matter knowledge lives. Source notes,
 entity notes, synthesis notes, design docs, debugging summaries,
 handoffs for the next agent -- whatever the project accumulates.
 
+Default habit: if something project-related might matter later, tell
+the agent in the project. You do not have to decide whether it belongs
+in `STATE.md`, a material, the index, or nowhere. The agent routes it:
+some context stays in chat, some updates current state, and some
+becomes durable project memory.
+
+You can also put files directly in `_knowledge/materials/`. Markdown,
+documents, images, exports, binary files, and other source artifacts
+are all fine. Human-added files do not need to follow the lowercase
+filename convention used for agent-created notes. Once a file is in
+`materials/`, it is part of the shared project knowledge namespace:
+agents may read it, summarize it, cross-reference it, create an
+indexed note about it, or ignore it if it is irrelevant or unsupported.
+Agents should edit human-added source artifacts only when asked. If a
+file should not be read at all or contains something that should not
+live in the repo, keep it somewhere else or say so explicitly.
+
+For files you want in the project corpus, use `_knowledge/materials/`
+or ask an agent to summarize the file there. Agents use `materials/`
+as the active knowledge namespace. If you only want to retain a raw
+source or historical backup, put it in `_knowledge/archive/` instead;
+agents may read archive files when source detail is needed, but they
+do not scan archive proactively.
+
 `_knowledge/materials/INDEX.md` is the keyword index over them,
-updated by the agent as files appear.
+updated by the agent as markdown working notes appear.
 
 `_knowledge/materials/OVERVIEW.md` is the external-facing
 announcement of what the project knows -- a paragraph plus keywords
@@ -97,13 +121,16 @@ should see:
 * `INDEX.md` entries for those notes.
 
 Most of the maintenance happens without you asking -- the template's
-core rules tell the agent to do it. Compliance varies a bit across
-tools and model tiers (the template's instructions are prose, and
-how strictly each model follows them isn't fully under the template's
-control), but in my testing the pattern shows up reliably within
-the first session or two. You can also drive maintenance explicitly
-when useful -- "consolidate these materials into STATE.md", "audit
-state", "wrap up the session and summarize what changed".
+core rules tell the agent to do it. The intended posture is to give
+the agent useful context and let it keep the knowledge layer coherent,
+then review important changes with normal git habits. Compliance
+varies a bit across tools and model tiers (the template's instructions
+are prose, and how strictly each model follows them isn't fully under
+the template's control), but in my testing the pattern shows up
+reliably within the first session or two. You can also drive
+maintenance explicitly when useful -- "consolidate these materials
+into STATE.md", "audit state", "wrap up the session and summarize
+what changed".
 
 Across sessions and across machines: the next agent opens the same
 repo, reads `STATE.md`, sees the hot list, knows what's going on.
