@@ -8,16 +8,21 @@
 > not only summarize it in chat. If not, ask what this project or
 > investigation is about. If `materials/` already contains working
 > files, read them first and infer project-facing topic areas for
-> Summary, Description, Keywords, and Can Answer. Fill the
+> Summary, Description, Keywords, and Can Answer. Do not infer a
+> canonical project name from the directory name; prefer a name-free
+> capability or scope sentence unless project context establishes a
+> canonical product, package, CLI, or user-provided name. Fill the
 > `YYYY-MM-DD` marker with today's date, remove all `<...>`
 > placeholders, and remove this entire NOTE block. See `AGENTS.md` ->
 > "Bootstrap" and "When updating OVERVIEW.md".
 
-# <Project Name> -- Overview (updated YYYY-MM-DD)
+# Overview (updated YYYY-MM-DD)
 
 ## Summary
 
-<Exactly one sentence usable in project lists, dashboards, and search results.>
+<Exactly one sentence usable in project lists, dashboards, and search results.
+Prefer a name-free capability or scope sentence unless project context
+establishes a canonical name.>
 
 ## Description
 

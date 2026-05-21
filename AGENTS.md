@@ -119,6 +119,11 @@ describes externally useful project knowledge, not `STATE.md`, `IDENTITY.md`,
 `VISION.md`, or internal operational status. It is an announcement, not a
 license to expose every material externally.
 
+Do not infer a canonical project name from the directory name. In `Summary`,
+prefer a name-free capability or scope sentence. Use a project, product, or
+package name only when it is canonical in project context, such as README title,
+package metadata, CLI name, or user-provided identity.
+
 `_knowledge/archive/` holds materials whose insights have been fully absorbed,
 plus raw sources that back summaries in `materials/`. Agents may read archive
 files when source detail is needed. Agents do not move files into archive unless
@@ -315,7 +320,8 @@ purpose.
 On update:
 
 * Keep `Summary` to exactly one sentence that can stand alone in project lists,
-  dashboards, and search results.
+  dashboards, and search results. Prefer a name-free capability or scope
+  sentence unless project context establishes a canonical name.
 * Rewrite `Description` when the project's purpose, output, investigation, or
   long-term direction becomes clearer.
 * Adjust `Keywords` when the discoverable topic set shifts; keep them broad,
