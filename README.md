@@ -1,6 +1,6 @@
 # Project Memory
 
-## The short story, and it's all you need to know
+## The short story, and it's all you really need to know
 
 * Project Memory puts a small, file-based memory layer inside your project.
 * It encourages agents to proactively preserve both project-domain knowledge
@@ -10,7 +10,7 @@
 * The memory is just Markdown in the repo: durable, versionable, inspectable,
   and easy to edit when you want to.
 
-## The longer story, in case you want to know more
+## The longer story, if you want to know more
 
 Most serious agent-assisted projects end up needing three things,
 informally:
