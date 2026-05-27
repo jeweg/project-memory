@@ -1,5 +1,17 @@
 # Project Memory
 
+## The short story, and it's all you need to know
+
+* Project Memory puts a small, file-based memory layer inside your project.
+* It encourages agents to proactively preserve both project-domain knowledge
+  and current project state while you work.
+* You do not need special incantations, slash commands, skills, or a Python
+  script to use it; open the project and ask ordinary project questions.
+* The memory is just Markdown in the repo: durable, versionable, inspectable,
+  and easy to edit when you want to.
+
+## The longer story, in case you want to know more
+
 Most serious agent-assisted projects end up needing three things,
 informally:
 
@@ -30,6 +42,26 @@ structure doesn't rot.
 Setup is one folder copy. Works in Cursor / Claude Code / Codex out
 of the box, no per-tool config. The next session on the same repo
 is never the first session.
+
+The most important user-facing point: you do not have to learn a
+special command language to use it.
+
+There are no secret prompts, no magic skill invocation, and no
+required Python script in the normal workflow. Open the project in
+your agent tool and ask ordinary project questions:
+
+* "Let's start this project; here is the context."
+* "What should I do first?"
+* "Summarize where we are."
+* "Capture this finding so we don't lose it."
+* "Audit the project memory for stale or contradictory notes."
+* "Wrap up the session and leave the next agent a handoff."
+
+The template's value is that the agent already has instructions for
+where durable context should go. You can ignore the internal file
+layout most of the time and just talk to the agent about the project.
+The files are there so the memory is durable, inspectable, editable,
+and portable when you need them.
 
 ## The three places
 
@@ -168,8 +200,17 @@ that lives somewhere else.
    steer the agent into the bootstrap.
 
 That's it. No install step, no service, no per-tool configuration.
+No special prompt is required beyond normal project context.
 
-## Customizing the agent rules
+## Optional: customizing the agent rules
+
+You can ignore this section when you are just using Project Memory.
+The default rules are the point: they let you talk to the agent in
+ordinary language while it handles the bookkeeping.
+
+Customize the rules only when you want to add team conventions,
+project-specific safety constraints, local build commands, or other
+standing instructions.
 
 Whether your tool reads `AGENTS.md` (Cursor, Codex CLI / IDE) or
 `CLAUDE.md` (Claude Code), the template generates both from the same
@@ -184,6 +225,10 @@ source fragments under `_agent-rules/`. To add or change rules:
    changes it didn't write, so a hand-edit (yours or an agent's)
    won't get silently clobbered. Copy any such changes into
    `_agent-rules/*.md` and re-run, or pass `--force`.
+
+This Python script is a maintenance helper for rule authors. It is
+not what makes Project Memory work day to day, and you do not need
+to run it to capture project memory.
 
 Check for stale output:
 
