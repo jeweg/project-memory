@@ -1,5 +1,7 @@
 # Agent Rules
 
+Template-Revision: b0215fe908db
+
 This file is generated. Direct edits are refused by the next
 regenerate to avoid losing them. When the user asks for a rule change,
 edit `_agent-rules/*.md` and run `python _agent-rules/compose.py`.
@@ -151,8 +153,9 @@ directories and commands.
 
 At the start of a session, read the cheapest sufficient context:
 
-1. Read `_knowledge/STATE.md` first. The hot list is the most useful entry
-   point.
+1. Read `_knowledge/STATE.md` first. Its two opening sections are the cheapest
+   entry point: `Hot List` for what is live, `Where To Look` for where the rest
+   of the corpus is.
 2. Read `_knowledge/IDENTITY.md` when the task touches architecture, posture,
    conventions, constraints, or when you are unsure whether a shortcut matches
    the project's worldview.
@@ -231,6 +234,7 @@ Curated files should read as current state, not as logs.
 * Rewrite the relevant section to reflect current understanding.
 * Preserve unrelated sections verbatim.
 * Do not append "update:" blocks or changelog fragments.
+* Do not snapshot machine-observable status (git/commit state, what is deployed or running, the live asset version, whether a file exists). It has an authoritative live source and rots silently in prose. If it matters for handoff, put it in the Hot List as an action item to clear.
 * Add a new section only when a new aspect has emerged that deserves its own
   place.
 * Keep cross-references among curated files accurate.
@@ -247,20 +251,27 @@ Freshness markers:
   Filenames do not encode freshness unless the date is part of the event being
   captured.
 
-#### STATE.md Hot List
+#### STATE.md Entry Point
 
-`STATE.md` starts with `## Hot List` after any preamble. It is the first thing
-a human or agent reads, so keep it current.
+After any preamble, `STATE.md` opens with `## Hot List`, then `## Where To Look`
+once the project has one; older projects predate it and are not malformed. They
+answer different questions and scale differently. Whenever you update any
+section of `STATE.md`, re-check them.
 
-The hot list is a short summary of the most important facts and priorities
-right now, typically around five bullets. The number is a smell detector, not a
-hard cap. Bullets should be terse: a headline plus pointers, not status
-paragraphs.
+`## Hot List` is what is live now -- current priorities, in-flight work, next
+action. Bounded by attention, not corpus size: around five terse bullets, each a
+headline plus a pointer. The number is a smell detector, not a hard cap. If a
+bullet keeps growing, or reads as a status log, move the detail to its proper
+home and leave a pointer.
 
-If a bullet keeps growing, content has crept in from another section. Move the
-detail to its proper home and leave a pointer. Whenever you update any section
-of `STATE.md`, re-check the hot list and rewrite it if the change alters what
-matters most.
+`## Where To Look` is the corpus map: pointers into the project's knowledge,
+grouped by area, so a reader can route without reading everything. It grows with
+the corpus, but sub-linearly, because it points at areas rather than files. One
+line per material is `INDEX.md`'s job, not this section's. No status here.
+
+Introduce it when the hot list starts carrying pointers that are not live work.
+Add it while already rewriting the hot list, or when asked -- not as an
+unrequested restructure of the file everyone reads first -- and say that you did.
 
 ### Materials Hygiene
 
@@ -306,7 +317,8 @@ and you cannot tell why, ask before deleting the entry.
 
 When a materials change shifts the project's externally visible topics, update
 `OVERVIEW.md` too.
-`INDEX.md` is per-file metadata; `OVERVIEW.md` is project-level description.
+`INDEX.md` is per-file metadata; `Where To Look` is the internal map;
+`OVERVIEW.md` is the external description.
 
 ### Updating OVERVIEW.md
 
@@ -360,7 +372,8 @@ move materials into the knowledge layer, do this:
 4. Apply the `IDENTITY.md` / `VISION.md` introduction rule above when the
    consolidation reveals that either file has been earned.
 5. Rewrite affected curated sections so they read as current state.
-6. Re-check the `STATE.md` hot list and update it if priorities changed.
+6. Re-check the `STATE.md` hot list and `Where To Look` map; update them if
+   priorities or the corpus shape changed.
 7. List materials that are now fully absorbed and can be moved to
    `_knowledge/archive/`.
 8. Flag materials that are only partially absorbed; they stay in `materials/`.
@@ -383,7 +396,9 @@ Audit the requested scope:
 * Check freshness markers, especially on fast-moving topics.
 * Spot-check code paths, class names, commands, or symbols referenced by the
   knowledge layer.
-* For `STATE.md`, verify the hot list reflects the sections below it.
+* For `STATE.md`, verify the hot list is live work rather than accumulated
+  status, and that `Where To Look` points at material that exists and covers the
+  corpus's main areas.
 * For `IDENTITY.md`, look for operational content that belongs in `STATE.md`
   and commitments violated by recent work.
 * For `VISION.md`, look for ambitions that have become active roadmap items.

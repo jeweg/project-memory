@@ -15,7 +15,15 @@
 
 ## Hot List
 
-* <up to 5 bullets: the most important facts and priorities right now>
+* <up to 5 bullets: what is live right now -- current priorities, in-flight
+  work, next action. A headline plus a pointer, not a status paragraph.>
+
+## Where To Look
+
+* <pointers into this project's knowledge, grouped by area, so a reader can
+  route without reading everything. No status here; one line per material is
+  `INDEX.md`'s job. Delete this section until the hot list starts carrying
+  pointers that are not live work.>
 
 ## Purpose (updated YYYY-MM-DD)
 

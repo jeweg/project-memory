@@ -36,6 +36,15 @@ Checks performed:
   line numbers where they occur. Missing files are flagged with a
   recovery hint. Code blocks are excluded from the placeholder scan
   so language generics like `Map<String, Integer>` do not trip it.
+* `STATE.md` entry point: if `## Hot List` has grown past an advisory
+  number of top-level bullets and there is no `## Where To Look`
+  section, report that the routing pointers have nowhere to live. This
+  counts bullets and looks for a heading; it does not judge whether
+  either section is honest. Skipped while `STATE.md` is still
+  unbootstrapped.
+* Template revision: when `AGENTS.md` is present, require its generated
+  header to carry one `Template-Revision:` line and echo that revision
+  in the checker output.
 * `INDEX.md` membership: every lowercase markdown working note in
   `_knowledge/materials/` has a `## filename.md` entry, and every entry points
   at a file that exists. Human-added Markdown files with non-working-note
@@ -64,6 +73,8 @@ PRE_SHIPPED_WITH_BANNER = (
     "_knowledge/materials/OVERVIEW.md",
 )
 
+STATE_PATH = "_knowledge/STATE.md"
+AGENTS_PATH = "AGENTS.md"
 INDEX_PATH = "_knowledge/materials/INDEX.md"
 MATERIALS_DIR = "_knowledge/materials"
 CANONICAL_MATERIALS_FILES = frozenset({"INDEX.md", "OVERVIEW.md"})
@@ -85,6 +96,21 @@ DATE_PLACEHOLDER_RE = re.compile(r"\bYYYY-MM-DD\b")
 WORKING_NOTE_FILENAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*\.md$")
 INDEX_HEADING_RE = re.compile(r"^##\s+([a-z0-9][a-z0-9._-]*\.md)\s*$")
 
+# `STATE.md` entry-point sections. Headings may carry a freshness marker
+# (`## Hot List (updated 2026-08-11)`), so match on the leading title text.
+SECTION_HEADING_RE = re.compile(r"^##\s+(.+?)\s*$")
+HOT_LIST_HEADING = "hot list"
+MAP_HEADING = "where to look"
+# Above this many top-level hot-list bullets, a project with no map section
+# is almost certainly holding routing pointers in the priority section. The
+# number is a trigger for a human or agent to look, not a limit.
+HOT_LIST_ADVISORY_MAX = 8
+TOP_LEVEL_BULLET_RE = re.compile(r"^[*+-]\s+\S")
+TEMPLATE_REVISION_RE = re.compile(
+    r"^Template-Revision:\s+([0-9a-f]{12})\s*$", re.MULTILINE
+)
+
+
 def recovery_hint(rel_path: str) -> str:
     return (
         f"restore with `git checkout HEAD -- {rel_path}` or copy "
@@ -105,6 +131,12 @@ def first_non_empty_line(text: str) -> str:
         if line.strip():
             return line
     return ""
+
+
+def has_banner(text: str) -> bool:
+    """True if the file still carries its template default-content banner."""
+    first = first_non_empty_line(text)
+    return first.startswith(">") and BANNER_PHRASE in text[:1000]
 
 
 def _strip_code_for_placeholder_check(text: str) -> str:
@@ -148,9 +180,7 @@ def check_bootstrap(root: Path) -> list[str]:
             )
             continue
         text = path.read_text(encoding="utf-8")
-        first = first_non_empty_line(text)
-        banner_present = first.startswith(">") and BANNER_PHRASE in text[:1000]
-        if banner_present:
+        if has_banner(text):
             findings.append(
                 f"{rel}: sentinel banner still present (unbootstrapped); "
                 f"use provided context or ask the user, fill the file, "
@@ -181,6 +211,73 @@ def check_bootstrap(root: Path) -> list[str]:
                 + " remain (broken bootstrap); finish replacing the defaults"
             )
     return findings
+
+
+def count_hot_list_bullets_and_find_map(text: str) -> tuple[int, bool]:
+    """Count top-level `## Hot List` bullets and report whether a map exists.
+
+    Nested bullets belong to their parent bullet and are not counted.
+    Fenced code blocks are skipped so a sample list inside a code block
+    does not inflate the count.
+    """
+    bullets = 0
+    map_present = False
+    in_hot_list = False
+    in_fence = False
+    for line in text.splitlines():
+        if line.lstrip().startswith(("```", "~~~")):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        heading = SECTION_HEADING_RE.match(line)
+        if heading:
+            title = heading.group(1).casefold()
+            in_hot_list = title.startswith(HOT_LIST_HEADING)
+            if title.startswith(MAP_HEADING):
+                map_present = True
+            continue
+        if in_hot_list and TOP_LEVEL_BULLET_RE.match(line):
+            bullets += 1
+    return bullets, map_present
+
+
+def check_state_entry_point(root: Path) -> list[str]:
+    path = root / STATE_PATH
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    if has_banner(text):
+        return []
+    bullets, map_present = count_hot_list_bullets_and_find_map(text)
+    if map_present or bullets <= HOT_LIST_ADVISORY_MAX:
+        return []
+    return [
+        f"{STATE_PATH}: `## Hot List` has {bullets} top-level bullets and "
+        f"there is no `## Where To Look` section (advisory: the routing "
+        f"pointers have nowhere to live; split them out -- see AGENTS.md "
+        f'-> "STATE.md Entry Point")'
+    ]
+
+
+def check_template_revision(root: Path) -> tuple[list[str], str | None]:
+    """Validate and return the revision carried by a present `AGENTS.md`."""
+    path = root / AGENTS_PATH
+    if not path.is_file():
+        return [], None
+    matches = TEMPLATE_REVISION_RE.findall(path.read_text(encoding="utf-8"))
+    if len(matches) == 1:
+        return [], matches[0]
+    if not matches:
+        return [
+            f"{AGENTS_PATH}: generated header has no valid "
+            f"`Template-Revision: <12 lowercase hex digits>` line; "
+            f"re-copy or recompose AGENTS.md from the template"
+        ], None
+    return [
+        f"{AGENTS_PATH}: generated header has {len(matches)} "
+        f"`Template-Revision:` lines; keep exactly one"
+    ], None
 
 
 def parse_index_entries(text: str) -> list[str]:
@@ -282,9 +379,14 @@ def main() -> int:
         return 2
 
     findings: list[str] = []
+    revision_findings, revision = check_template_revision(root)
+    findings.extend(revision_findings)
     findings.extend(check_bootstrap(root))
+    findings.extend(check_state_entry_point(root))
     findings.extend(check_index_membership(root))
 
+    if revision is not None:
+        print(f"Template-Revision: {revision}")
     if not findings:
         print("clean")
         return 0

@@ -23,10 +23,13 @@ HASH_PATH = SOURCE_DIR / ".agents-md.hash"
 
 GENERATED_HEADER = """# Agent Rules
 
+Template-Revision: {revision}
+
 This file is generated. Direct edits are refused by the next
 regenerate to avoid losing them. When the user asks for a rule change,
 edit `_agent-rules/*.md` and run `python _agent-rules/compose.py`.
 """
+TEMPLATE_REVISION_LENGTH = 12
 
 STALE_OUTPUT = 1
 USAGE_ERROR = 2
@@ -254,8 +257,9 @@ def read_fragment(path: Path) -> str | None:
         raise FragmentError(f"{path.relative_to(ROOT)}: {exc}") from exc
 
 
-def _compose(include_local: bool = False) -> tuple[str, int]:
-    parts = [GENERATED_HEADER.rstrip()]
+def _compose_rule_payload(include_local: bool = False) -> tuple[str, int]:
+    """Return the normalized rule payload without the generated header."""
+    parts: list[str] = []
     fragment_count = 0
     for path in fragment_files(include_local=include_local):
         fragment = read_fragment(path)
@@ -266,6 +270,32 @@ def _compose(include_local: bool = False) -> tuple[str, int]:
     if fragment_count == 0:
         raise FragmentError("_agent-rules/: no composable rule fragments found")
     return "\n\n".join(parts).rstrip() + "\n", fragment_count
+
+
+def git_blob_oid(text: str) -> str:
+    """Return the SHA-1 Git blob object ID for UTF-8 text."""
+    payload = text.encode("utf-8")
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
+
+
+def template_revision() -> str:
+    """Fingerprint the canonical portable rules with a short Git blob OID.
+
+    The generated header cannot contain the commit that contains itself: adding
+    that hash changes the commit. Hashing the canonical composed rule payload
+    instead is deterministic before commit, changes with each rule increment,
+    and is reproducible with Git's blob-hash algorithm. Local rules do not alter
+    the template revision.
+    """
+    canonical_payload, _ = _compose_rule_payload(include_local=False)
+    return git_blob_oid(canonical_payload)[:TEMPLATE_REVISION_LENGTH]
+
+
+def _compose(include_local: bool = False) -> tuple[str, int]:
+    payload, fragment_count = _compose_rule_payload(include_local=include_local)
+    header = GENERATED_HEADER.format(revision=template_revision()).rstrip()
+    return f"{header}\n\n{payload}", fragment_count
 
 
 def compose_agents(include_local: bool = False) -> str:
