@@ -86,9 +86,10 @@ template's discipline -- nothing is lost.
 ### Meta: `_knowledge/STATE.md` (always), `_knowledge/IDENTITY.md` and `_knowledge/VISION.md` (optional)
 
 `STATE.md` is the file the agent reads first. It opens with a Hot
-List -- the five most important things right now -- then carries
-Purpose, Open Questions, Action Items. Rewritten as understanding
-matures, not just appended to.
+List -- the five most important things right now -- followed by
+`Where To Look`, a compact map into the knowledge corpus. It then
+carries Purpose, Open Questions, and Action Items. It is rewritten
+as understanding matures, not just appended to.
 
 `IDENTITY.md` (introduced when earned) holds the project's
 worldview, architectural commitments, posture. The slow-changing
