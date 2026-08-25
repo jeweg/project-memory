@@ -38,9 +38,10 @@ Checks performed:
   so language generics like `Map<String, Integer>` do not trip it.
 * `STATE.md` entry point: if `## Hot List` has grown past an advisory
   number of top-level bullets and there is no `## Where To Look`
-  section, report that the routing pointers have nowhere to live. This
-  counts bullets and looks for a heading; it does not judge whether
-  either section is honest. Skipped while `STATE.md` is still
+  section, report that the routing pointers have nowhere to live. Once
+  `Where To Look` exists, report a separate advisory when the Hot List
+  itself exceeds about 30 non-blank lines. These checks do not judge
+  whether either section is honest. Skipped while `STATE.md` is still
   unbootstrapped.
 * Template revision: when `AGENTS.md` is present, require its generated
   header to carry one `Template-Revision:` line and echo that revision
@@ -105,6 +106,7 @@ MAP_HEADING = "where to look"
 # is almost certainly holding routing pointers in the priority section. The
 # number is a trigger for a human or agent to look, not a limit.
 HOT_LIST_ADVISORY_MAX = 8
+HOT_LIST_LINE_ADVISORY_MAX = 30
 TOP_LEVEL_BULLET_RE = re.compile(r"^[*+-]\s+\S")
 TEMPLATE_REVISION_RE = re.compile(
     r"^Template-Revision:\s+([0-9a-f]{12})\s*$", re.MULTILINE
@@ -213,14 +215,16 @@ def check_bootstrap(root: Path) -> list[str]:
     return findings
 
 
-def count_hot_list_bullets_and_find_map(text: str) -> tuple[int, bool]:
-    """Count top-level `## Hot List` bullets and report whether a map exists.
+def measure_state_entry_point(text: str) -> tuple[int, int, bool]:
+    """Measure `## Hot List` bullets/lines and report whether a map exists.
 
     Nested bullets belong to their parent bullet and are not counted.
     Fenced code blocks are skipped so a sample list inside a code block
-    does not inflate the count.
+    does not inflate the bullet count. Non-blank Hot List body lines are
+    counted regardless of indentation.
     """
     bullets = 0
+    nonblank_lines = 0
     map_present = False
     in_hot_list = False
     in_fence = False
@@ -237,8 +241,17 @@ def count_hot_list_bullets_and_find_map(text: str) -> tuple[int, bool]:
             if title.startswith(MAP_HEADING):
                 map_present = True
             continue
-        if in_hot_list and TOP_LEVEL_BULLET_RE.match(line):
-            bullets += 1
+        if in_hot_list:
+            if line.strip():
+                nonblank_lines += 1
+            if TOP_LEVEL_BULLET_RE.match(line):
+                bullets += 1
+    return bullets, nonblank_lines, map_present
+
+
+def count_hot_list_bullets_and_find_map(text: str) -> tuple[int, bool]:
+    """Backward-compatible projection of the original C14 measurement."""
+    bullets, _, map_present = measure_state_entry_point(text)
     return bullets, map_present
 
 
@@ -249,15 +262,22 @@ def check_state_entry_point(root: Path) -> list[str]:
     text = path.read_text(encoding="utf-8")
     if has_banner(text):
         return []
-    bullets, map_present = count_hot_list_bullets_and_find_map(text)
-    if map_present or bullets <= HOT_LIST_ADVISORY_MAX:
-        return []
-    return [
-        f"{STATE_PATH}: `## Hot List` has {bullets} top-level bullets and "
-        f"there is no `## Where To Look` section (advisory: the routing "
-        f"pointers have nowhere to live; split them out -- see AGENTS.md "
-        f'-> "STATE.md Entry Point")'
-    ]
+    bullets, nonblank_lines, map_present = measure_state_entry_point(text)
+    if not map_present and bullets > HOT_LIST_ADVISORY_MAX:
+        return [
+            f"{STATE_PATH}: `## Hot List` has {bullets} top-level bullets and "
+            f"there is no `## Where To Look` section (advisory: the routing "
+            f"pointers have nowhere to live; split them out -- see AGENTS.md "
+            f'-> "STATE.md Entry Point")'
+        ]
+    if map_present and nonblank_lines > HOT_LIST_LINE_ADVISORY_MAX:
+        return [
+            f"{STATE_PATH}: `## Hot List` has {nonblank_lines} non-blank lines "
+            f"despite a `## Where To Look` section (advisory: move durable "
+            f"detail and corpus navigation to their proper homes -- see "
+            f'AGENTS.md -> "STATE.md Entry Point")'
+        ]
+    return []
 
 
 def check_template_revision(root: Path) -> tuple[list[str], str | None]:

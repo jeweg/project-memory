@@ -20,16 +20,17 @@ ROOT = SOURCE_DIR.parent
 AGENTS_PATH = ROOT / "AGENTS.md"
 CLAUDE_PATH = ROOT / "CLAUDE.md"
 HASH_PATH = SOURCE_DIR / ".agents-md.hash"
+TEMPLATE_REVISION_PATH = SOURCE_DIR / "TEMPLATE_REVISION"
 
 GENERATED_HEADER = """# Agent Rules
 
 Template-Revision: {revision}
 
-This file is generated. Direct edits are refused by the next
-regenerate to avoid losing them. When the user asks for a rule change,
-edit `_agent-rules/*.md` and run `python _agent-rules/compose.py`.
+Generated file -- do not edit. Any rule change, whether you or the user
+started it, goes in `_agent-rules/*.md`; then run
+`python _agent-rules/compose.py`. Edits here are refused by the next
+regenerate and will be lost.
 """
-TEMPLATE_REVISION_LENGTH = 12
 
 STALE_OUTPUT = 1
 USAGE_ERROR = 2
@@ -46,6 +47,7 @@ IGNORED_FRAGMENT_NAMES = {
     "todo.md",
 }
 FRAGMENT_NAME_RE = re.compile(r"^(\d+)-[\w-]+\.md$", re.IGNORECASE)
+TEMPLATE_REVISION_RE = re.compile(r"^[0-9a-f]{12}$")
 FENCE_OPEN_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 
 HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
@@ -272,24 +274,26 @@ def _compose_rule_payload(include_local: bool = False) -> tuple[str, int]:
     return "\n\n".join(parts).rstrip() + "\n", fragment_count
 
 
-def git_blob_oid(text: str) -> str:
-    """Return the SHA-1 Git blob object ID for UTF-8 text."""
-    payload = text.encode("utf-8")
-    header = f"blob {len(payload)}\0".encode("ascii")
-    return hashlib.sha1(header + payload).hexdigest()
-
-
 def template_revision() -> str:
-    """Fingerprint the canonical portable rules with a short Git blob OID.
+    """Return the explicit shared-template release identifier.
 
-    The generated header cannot contain the commit that contains itself: adding
-    that hash changes the commit. Hashing the canonical composed rule payload
-    instead is deterministic before commit, changes with each rule increment,
-    and is reproducible with Git's blob-hash algorithm. Local rules do not alter
-    the template revision.
+    Release identity is deliberately independent of fragment contents. Local
+    rules and legitimate representation overlays may change composed bytes
+    without changing the installed shared release. Source/generated freshness
+    remains a separate check performed by ``--check``.
     """
-    canonical_payload, _ = _compose_rule_payload(include_local=False)
-    return git_blob_oid(canonical_payload)[:TEMPLATE_REVISION_LENGTH]
+    try:
+        revision = TEMPLATE_REVISION_PATH.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise FragmentError(
+            f"{TEMPLATE_REVISION_PATH.relative_to(ROOT)}: missing or unreadable"
+        ) from exc
+    if not TEMPLATE_REVISION_RE.fullmatch(revision):
+        raise FragmentError(
+            f"{TEMPLATE_REVISION_PATH.relative_to(ROOT)}: expected exactly "
+            "12 lowercase hexadecimal characters"
+        )
+    return revision
 
 
 def _compose(include_local: bool = False) -> tuple[str, int]:

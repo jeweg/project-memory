@@ -234,8 +234,9 @@ Curated files should read as current state, not as logs.
 Freshness markers:
 
 * `STATE.md` uses per-section markers, such as
-  `## Technical Status (updated YYYY-MM-DD)`. Update markers only on sections
-  you actually rewrite.
+  `## Technical Status (updated YYYY-MM-DD)`. A marker is a conservative lower
+  bound on recency: the section is no older than that date and may be newer.
+  Update markers only on sections you actually rewrite.
 * `IDENTITY.md` and `VISION.md` use a top-level marker on the document title.
   Bump it on substantive edits.
 * Materials do not require freshness markers. For long-lived materials, an
@@ -251,10 +252,11 @@ answer different questions and scale differently. Whenever you update any
 section of `STATE.md`, re-check them.
 
 `## Hot List` is what is live now -- current priorities, in-flight work, next
-action. Bounded by attention, not corpus size: around five terse bullets, each a
-headline plus a pointer. The number is a smell detector, not a hard cap. If a
-bullet keeps growing, or reads as a status log, move the detail to its proper
-home and leave a pointer.
+action. It is not a summary of `STATE.md` or of the project. Bounded by
+attention, not corpus size: around five terse bullets, each a headline plus a
+pointer. The number is a smell detector, not a hard cap. If a bullet keeps
+growing, or reads as a status log, move the detail to its proper home and leave
+a pointer.
 
 `## Where To Look` is the corpus map: pointers into the project's knowledge,
 grouped by area, so a reader can route without reading everything. It grows with
