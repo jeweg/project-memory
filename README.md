@@ -11,7 +11,7 @@
   and easy to edit when you want to.
 
 Usage:
-* Clone and copy the files into your project. Skip the .git directory and the README.md, it's just the template's description for Gitlab.
+* Clone and copy the files into your project. Skip the .git directory and the README.md; it is only this template's description.
 * Open your project as a workspace in your favorite agent tool (Cursor, Claude Code, Codex all work).
 * If the rest of the project already exists, consider asking an agent to "populate the knowledge corpus" to get it started. 
 
